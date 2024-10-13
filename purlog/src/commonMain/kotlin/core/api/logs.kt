@@ -5,6 +5,10 @@ import com.metashark.purlog.core.PurLogException
 import com.metashark.purlog.enums.PurLogEnv
 import com.metashark.purlog.enums.PurLogLevel
 import com.metashark.purlog.utils.get
+import com.metashark.purlog.utils.postLogInternal
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import utils.refreshTokenIfExpired
 
 internal suspend fun postLog(
     projectId: String,
@@ -43,8 +47,6 @@ internal suspend fun postLog(
     // Refresh token if expired
     refreshTokenIfExpired(projectJWT, sessionJWT, projectId)
 
-    val url = URL("https://us-central1-purlog-45f7f.cloudfunctions.net/api/logs")
-
     // Prepare the log data
     val logData = mapOf(
         "projectJWT" to projectJWT,
@@ -58,34 +60,10 @@ internal suspend fun postLog(
         "appVersion" to appVersion
     )
 
-    val requestBody = JSONObject(logData).toString().toByteArray()
+    // Serialize the LogData object to JSON
+    val logDataJson = Json.encodeToString(logData)
 
-    // Create HTTP request
-    val request = Request.Builder()
-        .url(url)
-        .post(requestBody.toRequestBody("application/json".toMediaType()))
-        .build()
-
-    return try {
-        val response = httpClient.newCall(request).await()
-
-        if (response.isSuccessful) {
-            Result.success(Unit)
-        } else {
-            Result.failure(
-                PurLogException(PurLogError.error(
-                    title = "Failed to create log",
-                    message = "Bad response.",
-                    logLevel = PurLogLevel.ERROR
-                ))
-            )
-        }
-    } catch (e: Exception) {
-        Result.failure(
-            PurLogException(PurLogError.error(
-                title = "Failed to create log",
-                error = e
-            ))
-        )
-    }
+    // Call the `postLog` function (it will use the platform-specific actual implementation)
+    val url = "https://us-central1-purlog-45f7f.cloudfunctions.net/api/logs"
+    return postLogInternal(url, logDataJson)
 }

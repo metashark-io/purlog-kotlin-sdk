@@ -11,13 +11,9 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-internal class SessionTokenManager private constructor() {
+internal object SessionTokenManager {
 
     var isRefreshing = false
-
-    companion object {
-        val shared: SessionTokenManager by lazy { SessionTokenManager() }
-    }
 
     suspend fun createToken(projectJWT: String, uuid: String, projectId: String): Result<String> {
         SdkLogger.shared.log(PurLogLevel.VERBOSE, "calling createToken")

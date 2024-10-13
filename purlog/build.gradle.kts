@@ -44,6 +44,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+                implementation("io.ktor:ktor-client-core:3.0.0") // Core Ktor Client
+                implementation("io.ktor:ktor-client-content-negotiation:3.0.0") // Content Negotiation
+                implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0") // JSON Serialization
             }
         }
         val commonTest by getting {
@@ -52,8 +55,23 @@ kotlin {
             }
         }
 
+        val androidMain by getting {
+            dependencies {
+                implementation("io.ktor:ktor-client-cio:3.0.0")  // JVM/Android engine
+            }
+        }
+
         val appleMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation("io.ktor:ktor-client-darwin:3.0.0")
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {
+                implementation("io.ktor:ktor-client-cio:3.0.0")  // JVM/Android engine
+            }
         }
 
         // iOS targets share appleMain
