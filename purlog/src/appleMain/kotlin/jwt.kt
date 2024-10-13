@@ -35,7 +35,7 @@ internal actual fun decodeJWT(jwt: String): Map<String, Any> {
 }
 
 @OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
-private fun NSData.toByteArray(): ByteArray {
+internal fun NSData.toByteArray(): ByteArray {
     val length = this.length.toInt()
     val byteArray = ByteArray(length)
 

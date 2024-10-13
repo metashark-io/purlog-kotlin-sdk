@@ -5,11 +5,9 @@ package com.metashark.purlog.utils
 import platform.Foundation.*
 import platform.Security.*
 import kotlinx.cinterop.*
-import platform.CoreFoundation.CFDictionaryRef
-
 import platform.CoreFoundation.CFTypeRefVar
-import platform.CoreFoundation.kCFBooleanTrue
 import kotlin.ByteArray
+import platform.CoreFoundation.*
 
 @OptIn(BetaInteropApi::class)
 private fun ByteArray.toNSData(): NSData {
@@ -17,34 +15,71 @@ private fun ByteArray.toNSData(): NSData {
 }
 
 internal actual fun save(token: String, alias: String): Boolean {
-    // Convert token to NSData
-    val data = token.encodeToByteArray().toNSData()
+    memScoped {
+        // Convert token to NSData
+        val data = token.encodeToByteArray().toNSData()
 
-    // Create a query for saving the token in the keychain
-    val query = mapOf(
-        kSecClass to kSecClassGenericPassword,
-        kSecAttrAccount to alias,
-        kSecValueData to data
-    )
+        // Create a mutable dictionary for the query
+        val query = CFDictionaryCreateMutable(null, 3, null, null)
 
-    // First delete any existing item
-    SecItemDelete(query as CFDictionaryRef)
+        // Add values to the query dictionary
+        CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
+        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(alias))
+        CFDictionaryAddValue(query, kSecValueData, CFBridgingRetain(data))
 
-    // Add the new item
-    val status = SecItemAdd(query as CFDictionaryRef, null)
+        // First delete any existing item for the alias
+        SecItemDelete(query)
 
-    return status == errSecSuccess
+        // Add the new item
+        val status = SecItemAdd(query, null)
+
+        return status == errSecSuccess
+    }
+}
+
+internal actual fun get(alias: String): String? {
+    memScoped {
+        // Create the query as a mutable CFDictionary
+        val query = CFDictionaryCreateMutable(null, 4, null, null)
+
+        // Add values to the query dictionary
+        CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
+        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(alias))
+        CFDictionaryAddValue(query, kSecReturnData, kCFBooleanTrue)
+        CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne)
+
+        // Allocate a pointer to store the result
+        val result = alloc<CFTypeRefVar>()
+
+        // Perform the query
+        val status = SecItemCopyMatching(query, result.ptr)
+
+        // If the query was successful, process the result
+        if (status == errSecSuccess && result.value != null) {
+            // Use CFBridgingRelease to cast the result to NSData
+            val data = CFBridgingRelease(result.value) as? NSData ?: return null
+            val byteArray = data.toByteArray()
+            return byteArray.decodeToString()
+        }
+        return null
+    }
 }
 
 internal actual fun delete(alias: String): Boolean {
-    // Create a query to delete the token from the keychain
-    val query = mapOf(
-        kSecClass to kSecClassGenericPassword,
-        kSecAttrAccount to alias
-    )
+    memScoped {
+        // Create a mutable dictionary for the query
+        val query = CFDictionaryCreateMutable(null, 2, null, null)
 
-    val status = SecItemDelete(query as CFDictionaryRef)
-    return status == errSecSuccess
+        // Add values to the query dictionary
+        CFDictionaryAddValue(query, kSecClass, kSecClassGenericPassword)
+        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(alias))
+
+        // Attempt to delete the keychain item
+        val status = SecItemDelete(query)
+
+        // Return true if deletion was successful
+        return status == errSecSuccess
+    }
 }
 
 internal actual fun createUUIDIfNotExists(): String? {
