@@ -11,7 +11,9 @@ import com.metashark.purlog.utils.createUUIDIfNotExists
 import com.metashark.purlog.utils.deviceInfo
 import com.metashark.purlog.utils.get
 import com.metashark.purlog.utils.ioDispatcher
+import com.metashark.purlog.utils.refreshTokenIfExpired
 import com.metashark.purlog.utils.shouldLog
+import core.api.SessionTokenManager.createToken
 import kotlinx.coroutines.withContext
 
 class PurLog private constructor() {
@@ -67,7 +69,7 @@ class PurLog private constructor() {
 
         var sessionJWT = get("PurLogSessionJWT")
         if (sessionJWT.isNullOrEmpty()) {
-            val tokenResult = SessionTokenManager.shared.createToken(projectJWT, uuid, projectId)
+            val tokenResult = createToken(projectJWT, uuid, projectId)
             sessionJWT = tokenResult.getOrNull()
             if (sessionJWT.isNullOrEmpty()) {
                 return@withContext Result.failure(
@@ -125,9 +127,5 @@ class PurLog private constructor() {
             deviceInfo = runTimeDeviceInfo,
             appVersion = appVersion
         )
-    }
-
-    private fun refreshTokenIfExpired(projectJWT: String, sessionJWT: String, projectId: String) {
-        // Logic for refreshing tokens
     }
 }

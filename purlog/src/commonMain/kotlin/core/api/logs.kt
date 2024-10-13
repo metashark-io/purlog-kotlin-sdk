@@ -6,9 +6,9 @@ import com.metashark.purlog.enums.PurLogEnv
 import com.metashark.purlog.enums.PurLogLevel
 import com.metashark.purlog.utils.get
 import com.metashark.purlog.utils.postLogInternal
+import com.metashark.purlog.utils.refreshTokenIfExpired
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import utils.refreshTokenIfExpired
 
 internal suspend fun postLog(
     projectId: String,
