@@ -1,14 +1,14 @@
 package com.metashark.purlog
 
-import com.metashark.purlog.core.KeyStoreWrapper
 import com.metashark.purlog.core.PurLogError
 import com.metashark.purlog.core.PurLogException
 import com.metashark.purlog.core.SdkLogger
+import com.metashark.purlog.core.api.postLog
 import com.metashark.purlog.enums.PurLogEnv
 import com.metashark.purlog.enums.PurLogLevel
 import com.metashark.purlog.models.PurLogConfig
-import com.metashark.purlog.models.PurLogDeviceInfo
 import com.metashark.purlog.utils.createUUIDIfNotExists
+import com.metashark.purlog.utils.deviceInfo
 import com.metashark.purlog.utils.get
 import com.metashark.purlog.utils.ioDispatcher
 import com.metashark.purlog.utils.shouldLog
@@ -18,19 +18,20 @@ class PurLog private constructor() {
 
     private var config: PurLogConfig = PurLogConfig(level = PurLogLevel.VERBOSE, env = PurLogEnv.DEV)
     private var isInitialized = false
-    private val deviceInfo = PurLogDeviceInfo().asMap()
     private val appVersion: String = "Unknown"  // Update this to fetch from Android's build config if needed
+    private var runTimeDeviceInfo: Map<String, String> = emptyMap()
 
     companion object {
         val shared: PurLog by lazy { PurLog() }
     }
 
-    suspend fun initialize(config: PurLogConfig): Result<Unit> = withContext(ioDispatcher) {
+    suspend fun initialize(config: PurLogConfig, androidApplicationContext: Any? = null): Result<Unit> = withContext(ioDispatcher) {
         if (isInitialized) {
             return@withContext Result.failure(
                 PurLogException(PurLogError.error("Initialization failed", "Already initialized", PurLogLevel.WARN))
             )
         }
+        runTimeDeviceInfo = deviceInfo(androidApplicationContext)
 
         SdkLogger.shared.initialize(config)
         this@PurLog.config = config
@@ -52,11 +53,11 @@ class PurLog private constructor() {
             )
         }
 
-        var uuid: String? = KeyStoreWrapper.get("PurLogSessionUUID")
+        var uuid: String? = get("PurLogSessionUUID")
         if (uuid.isNullOrEmpty()) {
             SdkLogger.shared.log(PurLogLevel.VERBOSE, "PurLogSessionUUID not found in Keychain. Creating a new one...")
             uuid = createUUIDIfNotExists()
-            if (uuid.isEmpty()) {
+            if (uuid.isNullOrEmpty()) {
                 return@withContext Result.failure(
                     PurLogException(PurLogError.error("Failed to initialize PurLog", "Invalid UUID", PurLogLevel.ERROR))
                 )
@@ -64,7 +65,7 @@ class PurLog private constructor() {
             SdkLogger.shared.log(PurLogLevel.VERBOSE, "PurLogSessionUUID created.")
         }
 
-        var sessionJWT = KeyStoreWrapper.get("PurLogSessionJWT")
+        var sessionJWT = get("PurLogSessionJWT")
         if (sessionJWT.isNullOrEmpty()) {
             val tokenResult = SessionTokenManager.shared.createToken(projectJWT, uuid, projectId)
             sessionJWT = tokenResult.getOrNull()
@@ -81,31 +82,31 @@ class PurLog private constructor() {
         Result.success(Unit)
     }
 
-    fun verbose(message: String, metadata: Map<String, String> = emptyMap()) {
+    suspend fun verbose(message: String, metadata: Map<String, String> = emptyMap()) {
         log(message, metadata, PurLogLevel.VERBOSE)
     }
 
-    fun debug(message: String, metadata: Map<String, String> = emptyMap()) {
+    suspend fun debug(message: String, metadata: Map<String, String> = emptyMap()) {
         log(message, metadata, PurLogLevel.DEBUG)
     }
 
-    fun info(message: String, metadata: Map<String, String> = emptyMap()) {
+    suspend fun info(message: String, metadata: Map<String, String> = emptyMap()) {
         log(message, metadata, PurLogLevel.INFO)
     }
 
-    fun warn(message: String, metadata: Map<String, String> = emptyMap()) {
+    suspend fun warn(message: String, metadata: Map<String, String> = emptyMap()) {
         log(message, metadata, PurLogLevel.WARN)
     }
 
-    fun error(message: String, metadata: Map<String, String> = emptyMap()) {
+    suspend fun error(message: String, metadata: Map<String, String> = emptyMap()) {
         log(message, metadata, PurLogLevel.ERROR)
     }
 
-    fun fatal(message: String, metadata: Map<String, String> = emptyMap()) {
+    suspend fun fatal(message: String, metadata: Map<String, String> = emptyMap()) {
         log(message, metadata, PurLogLevel.FATAL)
     }
 
-    private fun log(message: String, metadata: Map<String, String>, level: PurLogLevel) {
+    private suspend fun log(message: String, metadata: Map<String, String>, level: PurLogLevel) {
         if (!isInitialized) {
             SdkLogger.shared.log(PurLogLevel.ERROR, "Log failed. PurLog must be initialized")
             return
@@ -115,7 +116,15 @@ class PurLog private constructor() {
         SdkLogger.shared.consoleLog(config.env, level, message, metadata, false)
 
         val projectId = config.projectId ?: return
-        // Log posting logic
+        postLog(
+            projectId = projectId,
+            env = config.env,
+            logLevel = level,
+            message = message,
+            metadata = metadata,
+            deviceInfo = runTimeDeviceInfo,
+            appVersion = appVersion
+        )
     }
 
     private fun refreshTokenIfExpired(projectJWT: String, sessionJWT: String, projectId: String) {

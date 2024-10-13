@@ -1,11 +1,11 @@
-package com.metashark.purlog.models
+package com.metashark.purlog.utils
 
 import android.os.Build
 import android.content.Context
 import android.app.UiModeManager
 import android.content.res.Configuration
 
-data class PurLogDeviceInfo(
+private data class PurLogDeviceInfo(
     val osName: String,
     val osVersion: String
 ) {
@@ -44,10 +44,18 @@ data class PurLogDeviceInfo(
         }
     }
 
-    fun asMap(): Map<String, String> {
+    private fun asMap(): Map<String, String> {
         return mapOf(
             "osName" to osName,
             "osVersion" to osVersion
         )
+    }
+}
+
+actual fun deviceInfo(context: Any?): Map<String, String> {
+    if (context is Context) {
+        return PurLogDeviceInfo.create(context).asMap()
+    } else {
+        return emptyMap()
     }
 }

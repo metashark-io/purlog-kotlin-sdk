@@ -37,7 +37,7 @@ kotlin {
     tvosSimulatorArm64()
 
     // linux targets
-    linuxX64()
+    //linuxX64()
 
 
     sourceSets {
@@ -74,7 +74,26 @@ kotlin {
         val tvosX64Main by getting { dependsOn(appleMain) }
         val tvosArm64Main by getting { dependsOn(appleMain) }
         val tvosSimulatorArm64Main by getting { dependsOn(appleMain) }
+
+        //val linuxX64Main by getting {
+        //    kotlin.srcDir("src/linuxX64Main/kotlin")
+        //}
     }
+
+    /*linuxX64 {
+        binaries {
+            executable {
+                // Link against OpenSSL
+                linkerOpts("-lssl", "-lcrypto")
+            }
+        }
+
+        compilations["main"].cinterops {
+            val openssl by creating {
+                defFile = file("src/linuxX64Main/interop/openssl.def")
+            }
+        }
+    }*/
 }
 
 android {

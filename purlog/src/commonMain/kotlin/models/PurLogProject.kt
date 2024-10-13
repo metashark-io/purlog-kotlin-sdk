@@ -1,7 +1,5 @@
 package com.metashark.purlog.models
 
-import com.metashark.purlog.core.KeyStoreWrapper
-
 internal data class PurLogProject(
     val id: String // project id
 ) {

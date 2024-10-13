@@ -1,0 +1,2 @@
+headers = openssl/aes.h
+linkerOpts = -lssl -lcrypto

@@ -1,8 +1,5 @@
 package com.metashark.purlog.utils
 
-import com.metashark.purlog.core.PurLogError
-import com.metashark.purlog.core.PurLogException
-import com.metashark.purlog.enums.PurLogLevel
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -96,12 +93,12 @@ internal actual fun delete(alias: String): Boolean {
     }
 }
 
-internal actual fun createUUIDIfNotExists(): Result<String> {
+internal actual fun createUUIDIfNotExists(): String? {
     val sessionUUID = get("PurLogSessionUUID")
 
     return if (sessionUUID != null) {
         // UUID exists, return it as a success
-        Result.success(sessionUUID)
+        return sessionUUID
     } else {
         // UUID does not exist, generate a new one
         val newUUID = UUID.randomUUID().toString()
@@ -109,12 +106,12 @@ internal actual fun createUUIDIfNotExists(): Result<String> {
         // Attempt to save the new UUID to the KeyStore
         val saveResult = save(newUUID, "PurLogSessionUUID")
 
-        if (saveResult) {
+        return if (saveResult) {
             // Successfully saved, return the new UUID
-            Result.success(newUUID)
+            newUUID
         } else {
             // Failed to save the UUID, throw an exception
-            Result.failure(PurLogException(PurLogError.error("Failed to save UUID", "Could not save UUID to secure storage", PurLogLevel.ERROR)))
+            null
         }
     }
 }

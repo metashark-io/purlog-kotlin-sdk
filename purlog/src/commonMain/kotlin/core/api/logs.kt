@@ -4,6 +4,7 @@ import com.metashark.purlog.core.PurLogError
 import com.metashark.purlog.core.PurLogException
 import com.metashark.purlog.enums.PurLogEnv
 import com.metashark.purlog.enums.PurLogLevel
+import com.metashark.purlog.utils.get
 
 internal suspend fun postLog(
     projectId: String,
@@ -18,49 +19,25 @@ internal suspend fun postLog(
     var sessionJWT: String? = null
 
     // Retrieve projectJWT from KeystoreWrapper
-    when (val getProjectResult = KeystoreWrapper.shared.get("PurLogProjectJWT")) {
-        is Result.Success -> projectJWT = getProjectResult.data
-        is Result.Failure -> return Result.failure(
-            PurLogException(PurLogError.error(
-                title = "Failed to create log",
-                message = "Unable to retrieve project jwt from keystore. ${getProjectResult.error.message}",
-                logLevel = PurLogLevel.ERROR
-            ))
-        )
-    }
-
-    // Check if projectJWT is valid
+    projectJWT = get("PurLogProjectJWT")
     if (projectJWT.isNullOrBlank()) {
         return Result.failure(
             PurLogException(PurLogError.error(
                 title = "Failed to create log",
-                message = "Invalid project JWT",
+                message = "Unable to retrieve project jwt from keystore.",
                 logLevel = PurLogLevel.ERROR
             ))
         )
     }
 
     // Retrieve sessionJWT from KeystoreWrapper
-    when (val getSessionResult = KeystoreWrapper.shared.get("PurLogSessionJWT")) {
-        is Result.Success -> sessionJWT = getSessionResult.data
-        is Result.Failure -> return Result.failure(
-            PurLogException(PurLogError.error(
-                title = "Failed to create log",
-                message = "Unable to retrieve session jwt from keystore. ${getSessionResult.error.message}",
-                logLevel = PurLogLevel.ERROR
-            ))
-        )
-    }
-
-    // Check if sessionJWT is valid
+    sessionJWT = get("PurLogSessionJWT")
     if (sessionJWT.isNullOrBlank()) {
-        return Result.failure(
-            PurLogError(
-                title = "Failed to create log",
-                message = "Invalid session JWT",
-                logLevel = PurLogLevel.ERROR
-            )
-        )
+        return Result.failure(PurLogException(PurLogError.error(
+            title = "Failed to create log",
+            message = "Unable to retrieve session jwt from keystore",
+            logLevel = PurLogLevel.ERROR
+        )))
     }
 
     // Refresh token if expired
