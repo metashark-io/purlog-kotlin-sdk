@@ -11,9 +11,11 @@ jobs:
       - run:
           name: Install Android SDK and Tools
           command: |
-            mkdir -p $ANDROID_HOME/cmdline-tools/latest
+            mkdir -p $ANDROID_HOME/cmdline-tools
             wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip
-            unzip commandlinetools-linux-6858069_latest.zip -d $ANDROID_HOME/cmdline-tools/latest
+            unzip commandlinetools-linux-6858069_latest.zip -d $ANDROID_HOME/cmdline-tools
+            mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+            chmod +x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
             yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-30" "build-tools;30.0.3"
       - run:
           name: Calculate cache key
