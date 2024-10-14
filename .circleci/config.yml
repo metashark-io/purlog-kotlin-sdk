@@ -3,11 +3,13 @@ jobs:
   build-and-test-common:
     docker:
       - image: cimg/openjdk:17.0
-    environment:
-      ANDROID_HOME: ~/android-sdk
-      PATH: ~/android-sdk/cmdline-tools/latest/bin:$PATH
     steps:
       - checkout
+      - run:
+          name: Install essential tools
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y wget unzip
       - run:
           name: Install Android SDK and Tools
           command: |
