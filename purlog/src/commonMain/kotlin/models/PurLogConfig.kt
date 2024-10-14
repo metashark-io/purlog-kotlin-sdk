@@ -22,8 +22,8 @@ data class PurLogConfig(
         }
 
         fun setProject(projectId: String, projectJWT: String) = apply {
-            val project = PurLogProject(projectId, projectJWT)
-            this.projectId = project.id
+            PurLogProject.create(projectId, projectJWT)
+            this.projectId = projectId
         }
 
         fun build(): PurLogConfig {

@@ -1,17 +1,13 @@
 package com.metashark.purlog.models
 
+import com.metashark.purlog.utils.save
+
 internal data class PurLogProject(
     val id: String // project id
 ) {
-    init {
-        val saveResult = KeyStoreWrapper.save(token = projectJWT, forKey = "PurLogProjectJWT")
-        when (saveResult) {
-            is Result.Success -> {
-                // success
-            }
-            is Result.Failure -> {
-                return
-            }
+    companion object {
+        fun create(id: String, projectJWT: String) {
+            save(token = projectJWT, alias = "PurLogProjectJWT")
         }
     }
 }

@@ -44,7 +44,7 @@ private data class PurLogDeviceInfo(
         }
     }
 
-    private fun asMap(): Map<String, String> {
+    internal fun asMap(): Map<String, String> {
         return mapOf(
             "osName" to osName,
             "osVersion" to osVersion

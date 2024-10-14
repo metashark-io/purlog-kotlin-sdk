@@ -4,9 +4,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private fun getCurrentTimestamp(): String {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
-    return dateFormat.format(Date())
-}
+internal actual val currentTimestamp: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
 
-actual val currentTimestamp: String = getCurrentTimestamp()
+internal actual fun currentTimeMillis(): Long {
+    return System.currentTimeMillis()
+}

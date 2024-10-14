@@ -46,4 +46,3 @@ private fun checkTokenExpiration(sessionJWT: String): Result<TokenStatus> {
 }
 
 internal expect fun decodeJWT(jwt: String): Map<String, Any>
-internal expect fun currentTimeMillis(): Long

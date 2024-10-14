@@ -1,8 +1,6 @@
 package com.metashark.purlog.utils
 
-import platform.Foundation.NSDate
-import platform.Foundation.NSDateFormatter
-import platform.Foundation.NSLocale
+import platform.Foundation.*
 
 private fun getCurrentTimestamp(): String {
     val formatter = NSDateFormatter().apply {
@@ -12,4 +10,8 @@ private fun getCurrentTimestamp(): String {
     return formatter.stringFromDate(NSDate())
 }
 
-actual val currentTimestamp: String = getCurrentTimestamp()
+internal actual val currentTimestamp: String = getCurrentTimestamp()
+
+internal actual fun currentTimeMillis(): Long {
+    return (NSDate().timeIntervalSince1970 * 1000).toLong()
+}

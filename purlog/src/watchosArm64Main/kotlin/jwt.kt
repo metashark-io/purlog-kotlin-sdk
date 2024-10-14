@@ -37,7 +37,7 @@ import platform.Security.kSecValueData
 
 @OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 private fun ByteArray.toNSData(): NSData {
-    return NSData.create(bytes = this.refTo(0) as COpaquePointer?, length = this.size.toULong()) // Use toULong() for NSUInteger
+    return NSData.create(bytes = this.refTo(0) as COpaquePointer?, length = this.size.toUInt()) // Use toULong() for NSUInteger
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -75,7 +75,7 @@ internal actual fun decodeJWT(jwt: String): Map<String, Any> {
     fun decodeJWTPart(value: String): Map<String, Any> {
         val bodyDataByteArray = base64Decode(value)
         val bodyData = bodyDataByteArray.usePinned { pinned ->
-            NSData.create(bytes = pinned.addressOf(0), length = bodyDataByteArray.size.toULong()) // Use toUInt() instead of toULong()
+            NSData.create(bytes = pinned.addressOf(0), length = bodyDataByteArray.size.toUInt()) // Use toUInt() instead of toULong()
         }
         // Convert ByteArray to NSString using init with data and encoding
         val jsonString = NSString.create(bodyData, NSUTF8StringEncoding) ?: throw IllegalArgumentException("Failed to create string")
@@ -126,7 +126,7 @@ private fun NSData.toByteArray(): ByteArray {
     // Use pinned memory to get the pointer to the byte array
     byteArray.usePinned { pinned ->
         // Create an NSRange for the full length of the data
-        val range = NSMakeRange(0u, length.toULong())
+        val range = NSMakeRange(0u, length.toUInt())
         this.getBytes(pinned.addressOf(0), range)
     }
     return byteArray
