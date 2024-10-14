@@ -16,16 +16,12 @@ import com.metashark.purlog.utils.shouldLog
 import core.api.SessionTokenManager.createToken
 import kotlinx.coroutines.withContext
 
-class PurLog private constructor() {
+object PurLog {
 
     private var config: PurLogConfig = PurLogConfig(level = PurLogLevel.VERBOSE, env = PurLogEnv.DEV)
     private var isInitialized = false
     private val appVersion: String = "Unknown"  // Update this to fetch from Android's build config if needed
     private var runTimeDeviceInfo: Map<String, String> = emptyMap()
-
-    companion object {
-        val shared: PurLog by lazy { PurLog() }
-    }
 
     suspend fun initialize(config: PurLogConfig, androidApplicationContext: Any? = null): Result<Unit> = withContext(ioDispatcher) {
         if (isInitialized) {

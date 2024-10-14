@@ -14,7 +14,7 @@ internal class PurLogTests {
         val config = PurLogConfig(level = PurLogLevel.INFO, env = PurLogEnv.PROD)
 
         // Act
-        PurLog.shared.initialize(config)
+        PurLog.initialize(config)
 
         // Assert
         assertEquals(PurLogLevel.INFO, config.level)
