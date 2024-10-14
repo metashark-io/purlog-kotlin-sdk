@@ -3,21 +3,18 @@ jobs:
   build-and-test-common:
     docker:
       - image: cimg/openjdk:17.0
+    environment:
+      ANDROID_HOME: ~/android-sdk
+      PATH: ~/android-sdk/cmdline-tools/latest/bin:$PATH
     steps:
       - checkout
       - run:
           name: Install Android SDK and Tools
           command: |
-            sudo apt-get update
-            sudo apt-get install -y wget
+            mkdir -p $ANDROID_HOME/cmdline-tools/latest
             wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip
-            unzip commandlinetools-linux-6858069_latest.zip -d cmdline-tools
-            mkdir -p $ANDROID_HOME/cmdline-tools
-            mv cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-            yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-30" "build-tools;30.0.3"
-      - run:
-          name: Set ANDROID_HOME environment variable
-          command: echo 'export ANDROID_HOME=$HOME/android-sdk' >> $BASH_ENV
+            unzip commandlinetools-linux-6858069_latest.zip -d $ANDROID_HOME/cmdline-tools/latest
+            yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-30" "build-tools;30.0.3"
       - run:
           name: Calculate cache key
           command: |-
@@ -35,15 +32,6 @@ jobs:
           key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
           paths:
             - ~/.gradle/caches
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
-      - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
 workflows:
   build-and-test:
     jobs:
