@@ -6,9 +6,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Accept Licenses
-          command: sdkmanager --licenses
-      - run:
           name: Calculate cache key
           command: |-
             find . -name 'pom.xml' -o -name 'gradlew*' -o -name '*.gradle*' | \
@@ -16,15 +13,15 @@ jobs:
       - restore_cache:
           key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
       - run:
-          command: ./gradlew check
-      - store_test_results:
-          path: build/test-results
+          name: Run Build
+          command: ./gradlew build
+      - run:
+          name: Run Tests
+          command: ./gradlew testDebugUnitTest
       - save_cache:
           key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
           paths:
             - ~/.gradle/caches
-      - store_artifacts:
-          path: build/reports
   deploy:
     # This is an example deploy job, not actually used by the workflow
     docker:
