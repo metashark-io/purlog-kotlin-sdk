@@ -6,14 +6,9 @@ orbs:
 jobs:
   build-and-test-common:
     docker:
-      - image: cimg/openjdk:17.0
+      - image: cimg/android:2024.10
     steps:
       - checkout
-      - run:
-          name: Create local.properties file
-          command: |
-            touch local.properties
-            echo "sdk.dir=$ANDROID_HOME" >> local.properties
       - run:
           name: Calculate cache key
           command: |-
@@ -31,15 +26,6 @@ jobs:
           key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
           paths:
             - ~/.gradle/caches
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
-      - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
 workflows:
   build-and-test:
     jobs:
