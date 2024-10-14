@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  - build-and-test-common:
+  build-and-test-common:
     docker:
       - image: cimg/openjdk:17.0
     steps:
