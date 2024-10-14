@@ -6,6 +6,19 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install Android SDK and Tools
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y wget
+            wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip
+            unzip commandlinetools-linux-6858069_latest.zip -d cmdline-tools
+            mkdir -p $ANDROID_HOME/cmdline-tools
+            mv cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+            yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-30" "build-tools;30.0.3"
+      - run:
+          name: Set ANDROID_HOME environment variable
+          command: echo 'export ANDROID_HOME=$HOME/android-sdk' >> $BASH_ENV
+      - run:
           name: Calculate cache key
           command: |-
             find . -name 'pom.xml' -o -name 'gradlew*' -o -name '*.gradle*' | \
