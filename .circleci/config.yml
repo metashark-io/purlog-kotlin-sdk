@@ -1,40 +1,40 @@
 version: 2.1
-
-orbs:
-  android: circleci/android@2.2.0
-
 jobs:
-  build-and-test-common:
+  - build-and-test-common:
     docker:
-      - image: circleci/android:2022.12.1
-    environment:
-      ANDROID_HOME: /opt/android/sdk
-      ANDROID_SDK_ROOT: /opt/android/sdk
-      GRADLE_USER_HOME: ~/.gradle
+      - image: cimg/openjdk:17.0
     steps:
       - checkout
       - run:
           name: Accept Licenses
           command: sdkmanager --licenses
+      - run:
+          name: Calculate cache key
+          command: |-
+            find . -name 'pom.xml' -o -name 'gradlew*' -o -name '*.gradle*' | \
+                    sort | xargs cat > /tmp/CIRCLECI_CACHE_KEY
       - restore_cache:
-          key: gradle-cache-{{ checksum "build.gradle.kts" }}-{{ checksum "settings.gradle.kts" }}
+          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
       - run:
-          name: Run Gradle Build
-          command: ./gradlew build
-      - run:
-          name: Run Android Unit Tests
-          command: ./gradlew testDebugUnitTest
-      - save_cache:
-          paths:
-            - ~/.gradle/caches
-            - ~/.gradle/wrapper
-          key: gradle-cache-{{ checksum "build.gradle.kts" }}-{{ checksum "settings.gradle.kts" }}
+          command: ./gradlew check
       - store_test_results:
           path: build/test-results
+      - save_cache:
+          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+          paths:
+            - ~/.gradle/caches
       - store_artifacts:
-          path: build/reports/tests
-
+          path: build/reports
+  deploy:
+    # This is an example deploy job, not actually used by the workflow
+    docker:
+      - image: cimg/base:stable
+    steps:
+      # Replace this with steps to deploy to users
+      - run:
+          name: deploy
+          command: '#e.g. ./deploy.sh'
 workflows:
-  build_and_test:
+  build-and-test:
     jobs:
       - build-and-test-common
