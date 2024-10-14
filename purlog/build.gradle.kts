@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     id("module.publication")
+    id("maven-publish")
 }
 
 kotlin {
@@ -49,11 +50,6 @@ kotlin {
                 implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0") // JSON Serialization
             }
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
 
         val androidMain by getting {
             dependencies {
@@ -96,6 +92,48 @@ kotlin {
         //val linuxX64Main by getting {
         //    kotlin.srcDir("src/linuxX64Main/kotlin")
         //}
+
+
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0-RC.2")
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit")) // JUnit support for JVM
+            }
+        }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit")) // JUnit support for Android
+            }
+        }
+
+        val appleTest by creating {
+            dependsOn(commonTest)
+        }
+
+        // iOS targets share appleMain
+        val iosX64Test by getting { dependsOn(appleTest) }
+        val iosArm64Test by getting { dependsOn(appleTest) }
+        val iosSimulatorArm64Test by getting { dependsOn(appleTest) }
+
+        // macOS targets share appleMain
+        val macosX64Test by getting { dependsOn(appleTest) }
+        val macosArm64Test by getting { dependsOn(appleTest) }
+
+        // watchOS targets share appleMain
+        val watchosX64Test by getting { dependsOn(appleTest) }
+        val watchosArm64Test by getting { dependsOn(appleTest) }
+        val watchosSimulatorArm64Test by getting { dependsOn(appleTest) }
+
+        // tvOS targets share appleMain
+        val tvosX64Test by getting { dependsOn(appleTest) }
+        val tvosArm64Test by getting { dependsOn(appleTest) }
+        val tvosSimulatorArm64Test by getting { dependsOn(appleTest) }
     }
 
     /*linuxX64 {
@@ -119,5 +157,16 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["kotlin"])
+        }
+    }
+    repositories {
+        mavenLocal() // Publish to local Maven repository
     }
 }

@@ -1,0 +1,40 @@
+version: 2.1
+
+orbs:
+  android: circleci/android@2.2.0
+
+jobs:
+  build-and-test-common:
+    docker:
+      - image: circleci/android:2022.12.1
+    environment:
+      ANDROID_HOME: /opt/android/sdk
+      ANDROID_SDK_ROOT: /opt/android/sdk
+      GRADLE_USER_HOME: ~/.gradle
+    steps:
+      - checkout
+      - run:
+          name: Accept Licenses
+          command: sdkmanager --licenses
+      - restore_cache:
+          key: gradle-cache-{{ checksum "build.gradle.kts" }}-{{ checksum "settings.gradle.kts" }}
+      - run:
+          name: Run Gradle Build
+          command: ./gradlew build
+      - run:
+          name: Run Android Unit Tests
+          command: ./gradlew testDebugUnitTest
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+          key: gradle-cache-{{ checksum "build.gradle.kts" }}-{{ checksum "settings.gradle.kts" }}
+      - store_test_results:
+          path: build/test-results
+      - store_artifacts:
+          path: build/reports/tests
+
+workflows:
+  build_and_test:
+    jobs:
+      - build-and-test-common
