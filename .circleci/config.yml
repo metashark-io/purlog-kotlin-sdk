@@ -3,6 +3,9 @@ jobs:
   build-and-test-common:
     docker:
       - image: cimg/openjdk:17.0
+    environment:
+      ANDROID_HOME: ~/android-sdk
+      PATH: ~/android-sdk/cmdline-tools/latest/bin:$PATH
     steps:
       - checkout
       - run:
