@@ -2,11 +2,11 @@ import com.metashark.purlog.PurLog
 import com.metashark.purlog.enums.PurLogEnv
 import com.metashark.purlog.enums.PurLogLevel
 import com.metashark.purlog.models.PurLogConfig
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlinx.coroutines.test.runTest
 
-internal class PurLogTests {
+internal class PurLogAndroidTests {
 
     /*@Test
     fun testInitializeConfig() = runTest {

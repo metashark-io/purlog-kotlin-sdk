@@ -6,9 +6,10 @@ import platform.UIKit.UIDevice
 import platform.UIKit.UIUserInterfaceIdiomPad
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun deviceInfo(context: Any?): Map<String, String> {
+internal actual fun deviceInfo(context: Any?): Map<String, String> {
     val processInfo = NSProcessInfo.processInfo
     val osVersion = processInfo.operatingSystemVersion.toString()
+
     var osName = "iOS"
     if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
         osName = "iPadOS"

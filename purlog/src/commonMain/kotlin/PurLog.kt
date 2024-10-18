@@ -8,29 +8,26 @@ import com.metashark.purlog.enums.PurLogEnv
 import com.metashark.purlog.enums.PurLogLevel
 import com.metashark.purlog.models.PurLogConfig
 import com.metashark.purlog.utils.createUUIDIfNotExists
-import com.metashark.purlog.utils.deviceInfo
 import com.metashark.purlog.utils.get
-import com.metashark.purlog.utils.ioDispatcher
 import com.metashark.purlog.utils.refreshTokenIfExpired
+import com.metashark.purlog.utils.registerBouncyCastle
 import com.metashark.purlog.utils.shouldLog
 import core.api.SessionTokenManager.createToken
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object PurLog {
 
     private var config: PurLogConfig = PurLogConfig(level = PurLogLevel.VERBOSE, env = PurLogEnv.DEV)
     private var isInitialized = false
-    private val appVersion: String = "Unknown"  // Update this to fetch from Android's build config if needed
-    private var runTimeDeviceInfo: Map<String, String> = emptyMap()
 
-    suspend fun initialize(config: PurLogConfig, androidApplicationContext: Any? = null): Result<Unit> = withContext(ioDispatcher) {
+    suspend fun initialize(config: PurLogConfig): Result<Unit> = withContext(Dispatchers.Default) {
         if (isInitialized) {
             return@withContext Result.failure(
                 PurLogException(PurLogError.error("Initialization failed", "Already initialized", PurLogLevel.WARN))
             )
         }
-        runTimeDeviceInfo = deviceInfo(androidApplicationContext)
-
+        registerBouncyCastle()
         SdkLogger.shared.initialize(config)
         this@PurLog.config = config
         SdkLogger.shared.log(PurLogLevel.VERBOSE, "Initializing PurLog...")
@@ -120,8 +117,8 @@ object PurLog {
             logLevel = level,
             message = message,
             metadata = metadata,
-            deviceInfo = runTimeDeviceInfo,
-            appVersion = appVersion
+            deviceInfo = config.runTimeDeviceInfo,
+            appVersion = config.appVersion
         )
     }
 }

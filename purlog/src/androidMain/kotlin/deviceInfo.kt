@@ -4,6 +4,7 @@ import android.os.Build
 import android.content.Context
 import android.app.UiModeManager
 import android.content.res.Configuration
+import android.content.pm.PackageManager
 
 private data class PurLogDeviceInfo(
     val osName: String,
@@ -19,7 +20,7 @@ private data class PurLogDeviceInfo(
                 else -> "Android"
             }
 
-            val osVersion = Build.VERSION.RELEASE ?: "Unknown Version"
+            val osVersion = Build.VERSION.RELEASE ?: ""
             return PurLogDeviceInfo(osName, osVersion)
         }
 
@@ -52,10 +53,23 @@ private data class PurLogDeviceInfo(
     }
 }
 
-actual fun deviceInfo(context: Any?): Map<String, String> {
+internal actual fun deviceInfo(context: Any?): Map<String, String> {
     if (context is Context) {
         return PurLogDeviceInfo.create(context).asMap()
     } else {
         return emptyMap()
+    }
+}
+
+internal actual fun getClientVersion(context: Any?): String {
+    return if (context is Context) {
+        try {
+            val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            packageInfo.versionName ?: ""
+        } catch (e: PackageManager.NameNotFoundException) {
+            ""
+        }
+    } else {
+        ""
     }
 }

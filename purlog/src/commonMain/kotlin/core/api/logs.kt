@@ -57,7 +57,8 @@ internal suspend fun postLog(
         "env" to env.toString(),
         "deviceInfo" to deviceInfo,
         "metadata" to metadata,
-        "appVersion" to appVersion
+        "appVersion" to appVersion,
+        "sdk" to "kotlin"
     )
 
     // Serialize the LogData object to JSON

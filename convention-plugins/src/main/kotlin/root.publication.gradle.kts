@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.metashark.purlog.kotlin.sdk"
+    group = "com.metashark"
     version = "0.9.0"
 }
 

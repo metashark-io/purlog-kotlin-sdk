@@ -39,3 +39,5 @@ internal actual fun createUUIDIfNotExists(): String? {
         return null
     }
 }
+
+internal actual fun registerBouncyCastle() {}

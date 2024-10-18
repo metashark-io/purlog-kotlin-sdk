@@ -1,96 +1,121 @@
 package com.metashark.purlog.utils
 
+import java.util.UUID
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import java.io.File
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
-import java.util.Base64
-import java.util.UUID
+import android.util.Base64
 
-private val keyStore: KeyStore = KeyStore.getInstance("JCEKS").apply {
-    load(null, null) // Load the default keystore (or create a new one in memory)
-}
+private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+private const val AES_MODE = "AES/GCM/NoPadding"
+private const val GCM_TAG_LENGTH = 128
+private val baseDir = File(System.getProperty("user.dir"))
 
-private fun getOrCreateSecretKey(alias: String): SecretKey {
-    return getSecretKey(alias) ?: generateSecretKey(alias)
-}
+actual fun save(token: String, alias: String): Boolean {
+    return try {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
 
-private fun generateSecretKey(alias: String): SecretKey {
-    val keyGenerator = KeyGenerator.getInstance("AES")
-    keyGenerator.init(256) // Key size
-    val secretKey = keyGenerator.generateKey()
+        if (!keyStore.containsAlias(alias)) {
+            generateKey(alias)
+        }
 
-    // Store the secret key in the Java Keystore
-    val keyStoreEntry = KeyStore.SecretKeyEntry(secretKey)
-    keyStore.setEntry(alias, keyStoreEntry, null)
-    return secretKey
-}
+        val cipher = Cipher.getInstance(AES_MODE)
+        cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(alias))
 
-private fun getSecretKey(alias: String): SecretKey? {
-    return keyStore.getEntry(alias, null)?.let { it as KeyStore.SecretKeyEntry }?.secretKey
-}
+        val encryptionIv = cipher.iv
+        val encryptionData = cipher.doFinal(token.toByteArray(Charsets.UTF_8))
 
-private fun saveToSecureStorage(alias: String, encryptedData: ByteArray, iv: ByteArray) {
-    // Example implementation using Base64 encoding and storing in a map (replace with secure storage logic)
-    val base64EncryptedData = Base64.getEncoder().encodeToString(encryptedData)
-    val base64Iv = Base64.getEncoder().encodeToString(iv)
-    storageMap[alias] = Pair(base64EncryptedData, base64Iv)
-}
+        // Concatenate IV and encrypted data
+        val combinedIvData = encryptionIv + encryptionData
+        val encryptedData = Base64.encodeToString(combinedIvData, Base64.DEFAULT)
 
-private fun getFromSecureStorage(alias: String): Pair<ByteArray, ByteArray>? {
-    // Retrieve the encrypted data and IV from storage
-    val storedValues = storageMap[alias] ?: return null
-    val encryptedData = Base64.getDecoder().decode(storedValues.first)
-    val iv = Base64.getDecoder().decode(storedValues.second)
-    return Pair(encryptedData, iv)
-}
-
-// Simulated storage map for demonstration purposes (replace with secure storage mechanism)
-private val storageMap = mutableMapOf<String, Pair<String, String>>()
-
-internal actual fun save(token: String, alias: String): Boolean {
-    try {
-        val secretKey = getOrCreateSecretKey(alias)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-
-        val encryptedData = cipher.doFinal(token.toByteArray(Charsets.UTF_8))
-        val iv = cipher.iv
-
-        // Save the encrypted data and IV to secure storage
-        saveToSecureStorage(alias, encryptedData, iv)
-        return true
-    } catch (e: kotlin.Exception) {
+        // Save to file
+        saveToFile(alias, encryptedData)
+        true
+    } catch (e: Exception) {
         e.printStackTrace()
-        return false
+        false
     }
 }
 
-internal actual fun get(alias: String): String? {
-    try {
-        val (encryptedData, iv) = getFromSecureStorage(alias) ?: return null
+actual fun get(alias: String): String? {
+    return try {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
 
-        val secretKey = getSecretKey(alias) ?: return null
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
+        if (!keyStore.containsAlias(alias)) return null
 
-        val decryptedData = cipher.doFinal(encryptedData)
-        return String(decryptedData, Charsets.UTF_8)
-    } catch (e: kotlin.Exception) {
+        val encryptedData = getFromFile(alias) ?: return null
+        val combinedIvData = Base64.decode(encryptedData, Base64.DEFAULT)
+
+        // Split IV and data
+        val encryptionIv = combinedIvData.copyOfRange(0, 12)
+        val encryptionData = combinedIvData.copyOfRange(12, combinedIvData.size)
+
+        val cipher = Cipher.getInstance(AES_MODE)
+        val spec = GCMParameterSpec(GCM_TAG_LENGTH, encryptionIv)
+        cipher.init(Cipher.DECRYPT_MODE, getSecretKey(alias), spec)
+
+        val decryptedData = cipher.doFinal(encryptionData)
+        String(decryptedData, Charsets.UTF_8)
+    } catch (e: Exception) {
         e.printStackTrace()
-        return null
+        null
     }
 }
 
-internal actual fun delete(alias: String): Boolean {
-    try {
+actual fun delete(alias: String): Boolean {
+    return try {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
         keyStore.deleteEntry(alias)
-        return true
-    } catch (e: kotlin.Exception) {
+        deleteFile(alias)
+        true
+    } catch (e: Exception) {
         e.printStackTrace()
-        return false
+        false
     }
+}
+
+// Helper methods
+private fun generateKey(alias: String) {
+    val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE)
+    val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+        alias,
+        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+    )
+        .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+        .build()
+    keyGenerator.init(keyGenParameterSpec)
+    keyGenerator.generateKey()
+}
+
+private fun getSecretKey(alias: String): SecretKey {
+    val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+    return keyStore.getKey(alias, null) as SecretKey
+}
+
+// File-based methods
+private fun saveToFile(alias: String, value: String) {
+    val file = File(baseDir, alias)
+    file.writeText(value)
+}
+
+private fun getFromFile(alias: String): String? {
+    val file = File(baseDir, alias)
+    return if (file.exists()) file.readText() else null
+}
+
+private fun deleteFile(alias: String) {
+    val file = File(baseDir, alias)
+    if (file.exists()) file.delete()
+}
+
+internal actual fun registerBouncyCastle() {
 }
 
 internal actual fun createUUIDIfNotExists(): String? {

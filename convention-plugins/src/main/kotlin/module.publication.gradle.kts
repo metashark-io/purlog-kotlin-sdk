@@ -11,6 +11,7 @@ publishing {
     // Configure all publications
     publications.withType<MavenPublication> {
         // Stub javadoc.jar artifact
+        artifactId = "purlog"
         artifact(tasks.register("${name}JavadocJar", Jar::class) {
             archiveClassifier.set("javadoc")
             archiveAppendix.set(this@withType.name)

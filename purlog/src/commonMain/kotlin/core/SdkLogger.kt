@@ -31,14 +31,13 @@ internal class SdkLogger private constructor() {
 
         val formattedMessage = "[${currentTimestamp}] [${logLevel.name}]${if (isInternal) " [PurLog] " else " "}$message"
         val formattedMessageWithMetaData = if (metadata.isNotEmpty()) "$formattedMessage\n\nmetadata: $metadata" else formattedMessage
-
         when (logLevel) {
-            PurLogLevel.VERBOSE -> println("⚪️ $formattedMessageWithMetaData")
-            PurLogLevel.DEBUG -> println("🔵 $formattedMessageWithMetaData")
-            PurLogLevel.INFO -> println("🟢 $formattedMessageWithMetaData")
-            PurLogLevel.WARN -> println("🟡 $formattedMessageWithMetaData")
-            PurLogLevel.ERROR -> println("🔴 $formattedMessageWithMetaData")
-            PurLogLevel.FATAL -> println("🔴🔴🔴 $formattedMessageWithMetaData")
+            PurLogLevel.VERBOSE -> com.metashark.purlog.utils.logMessage(logLevel, "⚪️ $formattedMessageWithMetaData")
+            PurLogLevel.DEBUG -> com.metashark.purlog.utils.logMessage(logLevel, "🔵 $formattedMessageWithMetaData")
+            PurLogLevel.INFO -> com.metashark.purlog.utils.logMessage(logLevel, "🟢 $formattedMessageWithMetaData")
+            PurLogLevel.WARN -> com.metashark.purlog.utils.logMessage(logLevel, "🟡 $formattedMessageWithMetaData")
+            PurLogLevel.ERROR -> com.metashark.purlog.utils.logMessage(logLevel, "🔴 $formattedMessageWithMetaData")
+            PurLogLevel.FATAL -> com.metashark.purlog.utils.logMessage(logLevel, "🔴 $formattedMessageWithMetaData")
         }
     }
 }

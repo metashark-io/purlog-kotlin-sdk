@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    kotlin("plugin.serialization") version "2.0.20"
     alias(libs.plugins.androidLibrary)
     id("module.publication")
     id("maven-publish")
@@ -47,6 +48,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
                 implementation("io.ktor:ktor-client-core:3.0.0") // Core Ktor Client
                 implementation("io.ktor:ktor-client-content-negotiation:3.0.0") // Content Negotiation
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0") // JSON Serialization
             }
         }
@@ -54,6 +56,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:3.0.0")  // JVM/Android engine
+                implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
         }
 
@@ -64,16 +67,21 @@ kotlin {
             }
         }
 
+        val iosMain by creating {
+            dependsOn(appleMain)
+        }
+
         val jvmMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:3.0.0")  // JVM/Android engine
+                implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
         }
 
         // iOS targets share appleMain
-        val iosX64Main by getting { dependsOn(appleMain) }
-        val iosArm64Main by getting { dependsOn(appleMain) }
-        val iosSimulatorArm64Main by getting { dependsOn(appleMain) }
+        val iosX64Main by getting { dependsOn(iosMain) }
+        val iosArm64Main by getting { dependsOn(iosMain) }
+        val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
 
         // macOS targets share appleMain
         val macosX64Main by getting { dependsOn(appleMain) }
@@ -104,11 +112,13 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit")) // JUnit support for JVM
+                implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
         }
         val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test-junit")) // JUnit support for Android
+                implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
         }
 
@@ -116,10 +126,14 @@ kotlin {
             dependsOn(commonTest)
         }
 
+        val iosTest by creating {
+            dependsOn(appleTest)
+        }
+
         // iOS targets share appleMain
-        val iosX64Test by getting { dependsOn(appleTest) }
-        val iosArm64Test by getting { dependsOn(appleTest) }
-        val iosSimulatorArm64Test by getting { dependsOn(appleTest) }
+        val iosX64Test by getting { dependsOn(iosTest) }
+        val iosArm64Test by getting { dependsOn(iosTest) }
+        val iosSimulatorArm64Test by getting { dependsOn(iosTest) }
 
         // macOS targets share appleMain
         val macosX64Test by getting { dependsOn(appleTest) }
@@ -153,20 +167,9 @@ kotlin {
 }
 
 android {
-    namespace = "com.metashark.purlog.kotlin.sdk"
+    namespace = "com.metashark.purlog"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["kotlin"])
-        }
-    }
-    repositories {
-        mavenLocal() // Publish to local Maven repository
     }
 }

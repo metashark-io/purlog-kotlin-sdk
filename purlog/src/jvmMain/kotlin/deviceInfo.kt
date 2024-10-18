@@ -1,11 +1,15 @@
 package com.metashark.purlog.utils
 
-actual fun deviceInfo(context: Any?): Map<String, String> {
-    val osName = System.getProperty("os.name") ?: "Unknown OS"
-    val osVersion = System.getProperty("os.version") ?: "Unknown Version"
+internal actual fun deviceInfo(context: Any?): Map<String, String> {
+    val osName = System.getProperty("os.name") ?: ""
+    val osVersion = System.getProperty("os.version") ?: ""
 
     return mapOf(
         "osName" to osName,
         "osVersion" to osVersion
     )
+}
+
+internal actual fun getClientVersion(context: Any?): String {
+    return "" // TODO
 }

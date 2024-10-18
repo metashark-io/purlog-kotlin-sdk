@@ -8,3 +8,5 @@ internal fun shouldLog(logLevel: PurLogLevel, configLevel: PurLogLevel): Boolean
     val messageIndex = levels.indexOf(logLevel)
     return messageIndex >= currentIndex
 }
+
+internal expect fun logMessage(level: PurLogLevel, message: String)
