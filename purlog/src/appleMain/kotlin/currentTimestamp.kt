@@ -1,11 +1,12 @@
 package com.metashark.purlog.utils
 
-import platform.Foundation.*
+import platform.Foundation.NSDate
+import platform.Foundation.NSDateFormatter
+import platform.Foundation.timeIntervalSince1970
 
 private fun getCurrentTimestamp(): String {
     val formatter = NSDateFormatter().apply {
         dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        locale = NSLocale()
     }
     return formatter.stringFromDate(NSDate())
 }

@@ -1,12 +1,9 @@
 package com.metashark.purlog.utils
 
-import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSProcessInfo
 
-@OptIn(ExperimentalForeignApi::class)
 internal actual fun deviceInfo(context: Any?): Map<String, String> {
-    val processInfo = NSProcessInfo.processInfo
-    val osVersion = processInfo.operatingSystemVersion.toString()
+    val osVersion = NSProcessInfo.processInfo().operatingSystemVersionString()
 
     return mapOf(
         "osName" to "macOS",

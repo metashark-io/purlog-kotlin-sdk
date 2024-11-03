@@ -1,14 +1,13 @@
 package com.metashark.purlog.utils
 
+import com.metashark.purlog.models.SessionToken
 import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.UnsafeNumber
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
-import kotlinx.cinterop.refTo
 import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.value
 import kotlinx.serialization.json.Json
@@ -37,7 +36,9 @@ import platform.Security.kSecValueData
 
 @OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 private fun ByteArray.toNSData(): NSData {
-    return NSData.create(bytes = this.refTo(0) as COpaquePointer?, length = this.size.toULong()) // Use toULong() for NSUInteger
+    this.usePinned { pinned ->
+        return NSData.create(bytes = pinned.addressOf(0), length = this.size.toULong())
+    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -62,31 +63,6 @@ internal actual fun save(token: String, alias: String): Boolean {
 
         return status == errSecSuccess
     }
-}
-
-@OptIn(BetaInteropApi::class, ExperimentalForeignApi::class, UnsafeNumber::class)
-internal actual fun decodeJWT(jwt: String): Map<String, Any> {
-    fun base64Decode(value: String): ByteArray {
-        val normalizedBase64 = value.replace("-", "+").replace("_", "/")
-        val decodedData = NSData.create(normalizedBase64, 0u)
-        return decodedData?.toByteArray() ?: throw IllegalArgumentException("Invalid Base64")
-    }
-
-    fun decodeJWTPart(value: String): Map<String, Any> {
-        val bodyDataByteArray = base64Decode(value)
-        val bodyData = bodyDataByteArray.usePinned { pinned ->
-            NSData.create(bytes = pinned.addressOf(0), length = bodyDataByteArray.size.toULong()) // Use toUInt() instead of toULong()
-        }
-        // Convert ByteArray to NSString using init with data and encoding
-        val jsonString = NSString.create(bodyData, NSUTF8StringEncoding) ?: throw IllegalArgumentException("Failed to create string")
-        return Json.decodeFromString(jsonString.toString())
-    }
-
-    val segments = jwt.split(".")
-    if (segments.size < 2) {
-        throw IllegalArgumentException("Invalid JWT token")
-    }
-    return decodeJWTPart(segments[1])
 }
 
 @OptIn(ExperimentalForeignApi::class)

@@ -14,5 +14,5 @@ internal expect suspend fun createTokenInternal(
 
 internal expect suspend fun refreshTokenInternal(
     url: String,
-    bodyData: String
+    bodyData: String,
 ): Result<String>

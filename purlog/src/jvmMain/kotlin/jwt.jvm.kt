@@ -1,10 +1,11 @@
 package com.metashark.purlog.utils
 
+import com.metashark.purlog.models.SessionToken
 import kotlinx.serialization.json.Json
 import java.util.Base64
 
-internal actual fun decodeJWT(jwt: String): Map<String, Any> {
-    fun base64Decode(value: String): ByteArray {
+internal actual fun decodeJWT(jwt: String): SessionToken? {
+    /*fun base64Decode(value: String): ByteArray {
         val normalizedBase64 = value.replace("-", "+").replace("_", "/")
         return Base64.getDecoder().decode(normalizedBase64)
     }
@@ -19,5 +20,6 @@ internal actual fun decodeJWT(jwt: String): Map<String, Any> {
     if (segments.size < 2) {
         throw IllegalArgumentException("Invalid JWT token")
     }
-    return decodeJWTPart(segments[1])
+    return decodeJWTPart(segments[1])*/
+    return null
 }

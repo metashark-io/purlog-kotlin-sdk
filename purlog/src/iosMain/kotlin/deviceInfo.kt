@@ -1,14 +1,11 @@
 package com.metashark.purlog.utils
 
-import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSProcessInfo
 import platform.UIKit.UIDevice
 import platform.UIKit.UIUserInterfaceIdiomPad
 
-@OptIn(ExperimentalForeignApi::class)
 internal actual fun deviceInfo(context: Any?): Map<String, String> {
-    val processInfo = NSProcessInfo.processInfo
-    val osVersion = processInfo.operatingSystemVersion.toString()
+    val osVersion = NSProcessInfo.processInfo().operatingSystemVersionString()
 
     var osName = "iOS"
     if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {

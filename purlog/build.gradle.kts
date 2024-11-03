@@ -10,7 +10,7 @@ plugins {
 }
 
 kotlin {
-    jvm()
+    //jvm()
     // android target
     androidTarget {
         publishLibraryVariants("release")
@@ -71,12 +71,12 @@ kotlin {
             dependsOn(appleMain)
         }
 
-        val jvmMain by getting {
+        /*val jvmMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:3.0.0")  // JVM/Android engine
                 implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
-        }
+        }*/
 
         // iOS targets share appleMain
         val iosX64Main by getting { dependsOn(iosMain) }
@@ -109,12 +109,12 @@ kotlin {
             }
         }
 
-        val jvmTest by getting {
+        /*val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit")) // JUnit support for JVM
                 implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
-        }
+        }*/
         val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test-junit")) // JUnit support for Android

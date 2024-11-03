@@ -1,17 +1,14 @@
 package com.metashark.purlog.utils
 
 import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.UnsafeNumber
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
-import kotlinx.cinterop.refTo
 import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.value
-import kotlinx.serialization.json.Json
 import platform.CoreFoundation.CFDictionaryAddValue
 import platform.CoreFoundation.CFDictionaryCreateMutable
 import platform.CoreFoundation.CFTypeRefVar
@@ -20,8 +17,6 @@ import platform.Foundation.CFBridgingRelease
 import platform.Foundation.CFBridgingRetain
 import platform.Foundation.NSData
 import platform.Foundation.NSMakeRange
-import platform.Foundation.NSString
-import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.Foundation.getBytes
 import platform.Security.SecItemAdd
@@ -38,7 +33,9 @@ import platform.Security.kSecValueData
 
 @OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 private fun ByteArray.toNSData(): NSData {
-    return NSData.create(bytes = this.refTo(0) as COpaquePointer?, length = this.size.toULong()) // Use toULong() for NSUInteger
+    this.usePinned { pinned ->
+        return NSData.create(bytes = pinned.addressOf(0), length = this.size.toULong())
+    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -63,31 +60,6 @@ internal actual fun save(token: String, alias: String): Boolean {
 
         return status == errSecSuccess
     }
-}
-
-@OptIn(BetaInteropApi::class, ExperimentalForeignApi::class, UnsafeNumber::class)
-internal actual fun decodeJWT(jwt: String): Map<String, Any> {
-    fun base64Decode(value: String): ByteArray {
-        val normalizedBase64 = value.replace("-", "+").replace("_", "/")
-        val decodedData = NSData.create(normalizedBase64, 0u)
-        return decodedData?.toByteArray() ?: throw IllegalArgumentException("Invalid Base64")
-    }
-
-    fun decodeJWTPart(value: String): Map<String, Any> {
-        val bodyDataByteArray = base64Decode(value)
-        val bodyData = bodyDataByteArray.usePinned { pinned ->
-            NSData.create(bytes = pinned.addressOf(0), length = bodyDataByteArray.size.toULong()) // Use toUInt() instead of toULong()
-        }
-        // Convert ByteArray to NSString using init with data and encoding
-        val jsonString = NSString.create(bodyData, NSUTF8StringEncoding) ?: throw IllegalArgumentException("Failed to create string")
-        return Json.decodeFromString(jsonString.toString())
-    }
-
-    val segments = jwt.split(".")
-    if (segments.size < 2) {
-        throw IllegalArgumentException("Invalid JWT token")
-    }
-    return decodeJWTPart(segments[1])
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -126,7 +98,6 @@ private fun NSData.toByteArray(): ByteArray {
 
     // Use pinned memory to get the pointer to the byte array
     byteArray.usePinned { pinned ->
-        // Create an NSRange for the full length of the data
         val range = NSMakeRange(0u, length.toULong())
         this.getBytes(pinned.addressOf(0), range)
     }

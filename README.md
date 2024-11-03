@@ -18,5 +18,25 @@ commonMain.dependencies {
 }
 ```
 
-## Installation
+## Example
+
+```kotlin
+@Composable
+@Preview
+fun App() {
+    MaterialTheme {
+        val config = PurLogConfig.Builder()
+            .setProject(
+                projectId = "PROJECT_ID",
+                projectJWT = "PROECT_JWT" // DO NOT HARCODE; should be passed in securely from server
+            )
+            .build()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            PurLog.initialize(config)
+            PurLog.verbose("Test Verbose")
+        }
+    }
+}
+```
 

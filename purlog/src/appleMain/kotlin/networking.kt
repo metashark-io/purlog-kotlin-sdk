@@ -3,6 +3,7 @@ package com.metashark.purlog.utils
 import com.metashark.purlog.core.PurLogError
 import com.metashark.purlog.core.PurLogException
 import com.metashark.purlog.enums.PurLogLevel
+import com.metashark.purlog.models.TokenResponse
 import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.engine.darwin.* // Darwin engine for Apple platforms
@@ -67,8 +68,10 @@ internal actual suspend fun createTokenInternal(
 
         if (response.status == HttpStatusCode.OK) {
             val responseBody = response.body<String>()
-            val json = Json.decodeFromString<Map<String, String>>(responseBody)
-            Result.success(json["jwt"] ?: "")
+            val json = Json.decodeFromString<TokenResponse>(responseBody)
+            val sessionJWT = json.jwt ?: ""
+            save(sessionJWT, "PurLogSessionJWT")
+            Result.success(sessionJWT)
         } else {
             Result.failure(PurLogException(PurLogError.error("Failed to create session JWT", "Bad response: ${response.status}")))
         }
@@ -96,8 +99,10 @@ internal actual suspend fun refreshTokenInternal(
 
         if (response.status == HttpStatusCode.OK) {
             val responseBody = response.body<String>()
-            val json = Json.decodeFromString<Map<String, String>>(responseBody)
-            Result.success(json["jwt"] ?: "")
+            val json = Json.decodeFromString<TokenResponse>(responseBody)
+            val sessionJWT = json.jwt ?: ""
+            save(sessionJWT, "PurLogSessionJWT")
+            Result.success(sessionJWT)
         } else {
             Result.failure(PurLogException(PurLogError.error("Failed to refresh session JWT", "Bad response: ${response.status}")))
         }

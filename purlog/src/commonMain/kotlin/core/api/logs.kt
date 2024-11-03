@@ -4,6 +4,7 @@ import com.metashark.purlog.core.PurLogError
 import com.metashark.purlog.core.PurLogException
 import com.metashark.purlog.enums.PurLogEnv
 import com.metashark.purlog.enums.PurLogLevel
+import com.metashark.purlog.models.LogData
 import com.metashark.purlog.utils.get
 import com.metashark.purlog.utils.postLogInternal
 import com.metashark.purlog.utils.refreshTokenIfExpired
@@ -19,8 +20,8 @@ internal suspend fun postLog(
     deviceInfo: Map<String, String>,
     appVersion: String
 ): Result<Unit> {
-    var projectJWT: String? = null
-    var sessionJWT: String? = null
+    var projectJWT: String?
+    var sessionJWT: String?
 
     // Retrieve projectJWT from KeystoreWrapper
     projectJWT = get("PurLogProjectJWT")
@@ -48,17 +49,17 @@ internal suspend fun postLog(
     refreshTokenIfExpired(projectJWT, sessionJWT, projectId)
 
     // Prepare the log data
-    val logData = mapOf(
-        "projectJWT" to projectJWT,
-        "sessionJWT" to sessionJWT,
-        "projectId" to projectId,
-        "message" to message,
-        "level" to logLevel.toString(),
-        "env" to env.toString(),
-        "deviceInfo" to deviceInfo,
-        "metadata" to metadata,
-        "appVersion" to appVersion,
-        "sdk" to "kotlin"
+    val logData = LogData(
+        projectJWT = projectJWT,
+        sessionJWT = sessionJWT,
+        projectId = projectId,
+        message = message,
+        level = logLevel.toString(),
+        env = env.toString(),
+        deviceInfo = deviceInfo,
+        metadata = metadata,
+        appVersion = appVersion,
+        sdk = "kotlin"
     )
 
     // Serialize the LogData object to JSON

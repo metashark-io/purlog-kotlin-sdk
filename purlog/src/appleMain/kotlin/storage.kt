@@ -34,9 +34,9 @@ internal actual fun createUUIDIfNotExists(): String? {
     // Generate a new UUID and save it to the keychain
     val uuid = NSUUID().UUIDString()
     return if (save(uuid, "PurLogSessionUUID")) {
-        return uuid
+        uuid
     } else {
-        return null
+        null
     }
 }
 

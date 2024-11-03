@@ -5,6 +5,7 @@ import com.metashark.purlog.core.PurLogError
 import com.metashark.purlog.core.SdkLogger
 import com.metashark.purlog.enums.PurLogLevel
 import com.metashark.purlog.enums.TokenStatus
+import com.metashark.purlog.models.SessionToken
 import core.api.SessionTokenManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,7 +33,7 @@ internal suspend fun refreshTokenIfExpired(projectJWT: String, sessionJWT: Strin
 private fun checkTokenExpiration(sessionJWT: String): Result<TokenStatus> {
     return try {
         val jwt = decodeJWT(sessionJWT)
-        val expirationTimestamp = jwt["expiration"] as? Double
+        val expirationTimestamp = jwt?.expiration
         if (expirationTimestamp != null) {
             val expirationDate = expirationTimestamp * 1000 // Convert to milliseconds
             val isExpired = expirationDate < currentTimeMillis()
@@ -45,4 +46,4 @@ private fun checkTokenExpiration(sessionJWT: String): Result<TokenStatus> {
     }
 }
 
-internal expect fun decodeJWT(jwt: String): Map<String, Any>
+internal expect fun decodeJWT(jwt: String): SessionToken?
