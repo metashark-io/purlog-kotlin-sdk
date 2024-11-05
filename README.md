@@ -19,7 +19,7 @@ A remote logging SDK for Native Android and Kotlin Multi Platform (Android, iOS,
 
 ```groovy
 dependencies {
-    implementation("com.metashark:purlog:0.9.0")
+    implementation("io.metashark:purlog:0.9.0")
 }
 ```
 
