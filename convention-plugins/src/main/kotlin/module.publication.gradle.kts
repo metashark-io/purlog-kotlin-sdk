@@ -3,6 +3,7 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.`maven-publish`
 
 plugins {
+    id("com.vanniktech.maven.publish") version "0.29.0"
     `maven-publish`
     signing
 }
@@ -11,7 +12,9 @@ publishing {
     // Configure all publications
     publications.withType<MavenPublication> {
         // Stub javadoc.jar artifact
+        groupId = "io.metashark"
         artifactId = "purlog"
+        version = "0.9.0"
         artifact(tasks.register("${name}JavadocJar", Jar::class) {
             archiveClassifier.set("javadoc")
             archiveAppendix.set(this@withType.name)
@@ -39,6 +42,8 @@ publishing {
             }
             scm {
                 url.set("https://github.com/metashark-io/purlog-kotlin-sdk")
+                connection.set("scm:git:git://github.com/metashark-io/purlog-kotlin-sdk.git")
+                developerConnection.set("scm:git:ssh://git@github.com/metashark-io/purlog-kotlin-sdk.git")
             }
         }
     }
