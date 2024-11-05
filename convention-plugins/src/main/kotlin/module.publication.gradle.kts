@@ -3,7 +3,6 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.`maven-publish`
 
 plugins {
-    id("com.vanniktech.maven.publish") version "0.29.0"
     `maven-publish`
     signing
 }
