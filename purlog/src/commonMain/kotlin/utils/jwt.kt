@@ -1,11 +1,11 @@
-package com.metashark.purlog.utils
+package io.metashark.purlog.utils
 
-import com.metashark.purlog.core.PurLogException
-import com.metashark.purlog.core.PurLogError
-import com.metashark.purlog.core.SdkLogger
-import com.metashark.purlog.enums.PurLogLevel
-import com.metashark.purlog.enums.TokenStatus
-import com.metashark.purlog.models.SessionToken
+import io.metashark.purlog.core.PurLogException
+import io.metashark.purlog.core.PurLogError
+import io.metashark.purlog.core.SdkLogger
+import io.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.enums.TokenStatus
+import io.metashark.purlog.models.SessionToken
 import core.api.SessionTokenManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

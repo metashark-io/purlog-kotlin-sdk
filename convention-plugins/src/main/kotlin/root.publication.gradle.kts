@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.metashark"
+    group = "io.metashark"
     version = "0.9.0"
 }
 

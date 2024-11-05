@@ -1,6 +1,6 @@
-package com.metashark.purlog.core
+package io.metashark.purlog.core
 
-import com.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.enums.PurLogLevel
 
 data class PurLogError(
     val title: String,

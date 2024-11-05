@@ -1,7 +1,7 @@
-package com.metashark.purlog.utils
+package io.metashark.purlog.utils
 
 import android.util.Log
-import com.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.enums.PurLogLevel
 
 internal actual fun logMessage(level: PurLogLevel, message: String) {
     when (level) {

@@ -1,4 +1,4 @@
-package com.metashark.purlog.utils
+package io.metashark.purlog.utils
 
 import android.os.Build
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.metashark.purlog.utils
+package io.metashark.purlog.utils
 
 
 internal expect fun save(token: String, alias: String): Boolean

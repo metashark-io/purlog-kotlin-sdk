@@ -1,7 +1,7 @@
-import com.metashark.purlog.PurLog
-import com.metashark.purlog.enums.PurLogEnv
-import com.metashark.purlog.enums.PurLogLevel
-import com.metashark.purlog.models.PurLogConfig
+import io.metashark.purlog.PurLog
+import io.metashark.purlog.enums.PurLogEnv
+import io.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.models.PurLogConfig
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

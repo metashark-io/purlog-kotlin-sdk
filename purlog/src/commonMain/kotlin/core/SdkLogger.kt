@@ -1,10 +1,10 @@
-package com.metashark.purlog.core
+package io.metashark.purlog.core
 
-import com.metashark.purlog.enums.PurLogEnv
-import com.metashark.purlog.enums.PurLogLevel
-import com.metashark.purlog.models.PurLogConfig
-import com.metashark.purlog.utils.currentTimestamp
-import com.metashark.purlog.utils.shouldLog
+import io.metashark.purlog.enums.PurLogEnv
+import io.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.models.PurLogConfig
+import io.metashark.purlog.utils.currentTimestamp
+import io.metashark.purlog.utils.shouldLog
 
 internal class SdkLogger private constructor() {
 
@@ -32,12 +32,12 @@ internal class SdkLogger private constructor() {
         val formattedMessage = "[${currentTimestamp}] [${logLevel.name}]${if (isInternal) " [PurLog] " else " "}$message"
         val formattedMessageWithMetaData = if (metadata.isNotEmpty()) "$formattedMessage\n\nmetadata: $metadata" else formattedMessage
         when (logLevel) {
-            PurLogLevel.VERBOSE -> com.metashark.purlog.utils.logMessage(logLevel, "⚪️ $formattedMessageWithMetaData")
-            PurLogLevel.DEBUG -> com.metashark.purlog.utils.logMessage(logLevel, "🔵 $formattedMessageWithMetaData")
-            PurLogLevel.INFO -> com.metashark.purlog.utils.logMessage(logLevel, "🟢 $formattedMessageWithMetaData")
-            PurLogLevel.WARN -> com.metashark.purlog.utils.logMessage(logLevel, "🟡 $formattedMessageWithMetaData")
-            PurLogLevel.ERROR -> com.metashark.purlog.utils.logMessage(logLevel, "🔴 $formattedMessageWithMetaData")
-            PurLogLevel.FATAL -> com.metashark.purlog.utils.logMessage(logLevel, "🔴🔴🔴 $formattedMessageWithMetaData") 
+            PurLogLevel.VERBOSE -> io.metashark.purlog.utils.logMessage(logLevel, "⚪️ $formattedMessageWithMetaData")
+            PurLogLevel.DEBUG -> io.metashark.purlog.utils.logMessage(logLevel, "🔵 $formattedMessageWithMetaData")
+            PurLogLevel.INFO -> io.metashark.purlog.utils.logMessage(logLevel, "🟢 $formattedMessageWithMetaData")
+            PurLogLevel.WARN -> io.metashark.purlog.utils.logMessage(logLevel, "🟡 $formattedMessageWithMetaData")
+            PurLogLevel.ERROR -> io.metashark.purlog.utils.logMessage(logLevel, "🔴 $formattedMessageWithMetaData")
+            PurLogLevel.FATAL -> io.metashark.purlog.utils.logMessage(logLevel, "🔴🔴🔴 $formattedMessageWithMetaData")
         }
     }
 }

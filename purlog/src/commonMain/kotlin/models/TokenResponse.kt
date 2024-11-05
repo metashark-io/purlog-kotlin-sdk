@@ -1,4 +1,4 @@
-package com.metashark.purlog.models
+package io.metashark.purlog.models
 
 import kotlinx.serialization.Serializable
 

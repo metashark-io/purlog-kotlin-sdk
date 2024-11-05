@@ -1,13 +1,13 @@
-package com.metashark.purlog.core.api
+package io.metashark.purlog.core.api
 
-import com.metashark.purlog.core.PurLogError
-import com.metashark.purlog.core.PurLogException
-import com.metashark.purlog.enums.PurLogEnv
-import com.metashark.purlog.enums.PurLogLevel
-import com.metashark.purlog.models.LogData
-import com.metashark.purlog.utils.get
-import com.metashark.purlog.utils.postLogInternal
-import com.metashark.purlog.utils.refreshTokenIfExpired
+import io.metashark.purlog.core.PurLogError
+import io.metashark.purlog.core.PurLogException
+import io.metashark.purlog.enums.PurLogEnv
+import io.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.models.LogData
+import io.metashark.purlog.utils.get
+import io.metashark.purlog.utils.postLogInternal
+import io.metashark.purlog.utils.refreshTokenIfExpired
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

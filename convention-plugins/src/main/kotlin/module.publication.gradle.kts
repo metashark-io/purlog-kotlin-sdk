@@ -20,7 +20,7 @@ publishing {
         // Provide artifacts information required by Maven Central
         pom {
             name.set("PurLog")
-            description.set("A remote logging SDK")
+            description.set("A remote logging SDK for Native Android and Kotlin Multi Platform (Android, iOS, iPadOS, macOS, watchOS, tvOS).")
             url.set("https://github.com/metashark-io/purlog-kotlin-sdk")
 
             licenses {

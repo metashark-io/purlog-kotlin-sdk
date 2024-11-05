@@ -1,6 +1,6 @@
-package com.metashark.purlog.models
+package io.metashark.purlog.models
 
-import com.metashark.purlog.utils.save
+import io.metashark.purlog.utils.save
 
 internal data class PurLogProject(
     val id: String // project id

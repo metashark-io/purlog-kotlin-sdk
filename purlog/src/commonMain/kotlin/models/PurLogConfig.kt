@@ -1,11 +1,11 @@
-package com.metashark.purlog.models
+package io.metashark.purlog.models
 
-import com.metashark.purlog.enums.PurLogEnv
-import com.metashark.purlog.enums.PurLogLevel
-import com.metashark.purlog.utils.deviceInfo
-import com.metashark.purlog.utils.didInitializeContext
-import com.metashark.purlog.utils.getClientVersion
-import com.metashark.purlog.utils.initializeAndroidSecureStorageManager
+import io.metashark.purlog.enums.PurLogEnv
+import io.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.utils.deviceInfo
+import io.metashark.purlog.utils.didInitializeContext
+import io.metashark.purlog.utils.getClientVersion
+import io.metashark.purlog.utils.initializeAndroidSecureStorageManager
 
 data class PurLogConfig(
     val level: PurLogLevel,

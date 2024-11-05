@@ -1,3 +1,3 @@
-package com.metashark.purlog.core
+package io.metashark.purlog.core
 
 class PurLogException(error: PurLogError) : Throwable(error.message)

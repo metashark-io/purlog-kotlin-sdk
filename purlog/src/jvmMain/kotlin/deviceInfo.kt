@@ -1,4 +1,4 @@
-package com.metashark.purlog.utils
+package io.metashark.purlog.utils
 
 internal actual fun deviceInfo(context: Any?): Map<String, String> {
     val osName = System.getProperty("os.name") ?: ""

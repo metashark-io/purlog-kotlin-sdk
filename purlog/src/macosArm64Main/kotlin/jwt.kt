@@ -1,6 +1,6 @@
-package com.metashark.purlog.utils
+package io.metashark.purlog.utils
 
-import com.metashark.purlog.models.SessionToken
+import io.metashark.purlog.models.SessionToken
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.UnsafeNumber

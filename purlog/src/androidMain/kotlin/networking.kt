@@ -1,9 +1,9 @@
-package com.metashark.purlog.utils
+package io.metashark.purlog.utils
 
-import com.metashark.purlog.core.PurLogError
-import com.metashark.purlog.core.PurLogException
-import com.metashark.purlog.enums.PurLogLevel
-import com.metashark.purlog.models.TokenResponse
+import io.metashark.purlog.core.PurLogError
+import io.metashark.purlog.core.PurLogException
+import io.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.models.TokenResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.*

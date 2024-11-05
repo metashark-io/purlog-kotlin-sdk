@@ -1,4 +1,4 @@
-package com.metashark.purlog.enums
+package io.metashark.purlog.enums
 
 enum class PurLogEnv {
     DEV,

@@ -1,10 +1,10 @@
 package core.api
 
 
-import com.metashark.purlog.core.SdkLogger
-import com.metashark.purlog.enums.PurLogLevel
-import com.metashark.purlog.utils.createTokenInternal
-import com.metashark.purlog.utils.refreshTokenInternal
+import io.metashark.purlog.core.SdkLogger
+import io.metashark.purlog.enums.PurLogLevel
+import io.metashark.purlog.utils.createTokenInternal
+import io.metashark.purlog.utils.refreshTokenInternal
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
