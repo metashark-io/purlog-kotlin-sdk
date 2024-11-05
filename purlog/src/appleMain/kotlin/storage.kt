@@ -40,4 +40,9 @@ internal actual fun createUUIDIfNotExists(): String? {
     }
 }
 
-internal actual fun registerBouncyCastle() {}
+internal actual fun didInitializeContext(didInitContext: Boolean): Boolean {
+    return true
+}
+internal actual fun initializeAndroidSecureStorageManager(context: Any?): Boolean {
+    return true
+}

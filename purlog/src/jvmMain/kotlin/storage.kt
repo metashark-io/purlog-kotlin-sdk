@@ -106,7 +106,7 @@ internal actual fun delete(alias: String): Boolean {
 internal actual fun createUUIDIfNotExists(): String? {
     val sessionUUID = get("PurLogSessionUUID")
 
-    return if (sessionUUID != null) {
+    if (sessionUUID != null) {
         // UUID exists, return it as a success
         return sessionUUID
     } else {
@@ -126,6 +126,10 @@ internal actual fun createUUIDIfNotExists(): String? {
     }
 }
 
-internal actual fun registerBouncyCastle() {
-    Security.insertProviderAt(BouncyCastleProvider(), 1)
+internal actual fun didInitializeContext(didInitContext: Boolean): Boolean {
+    return true
+}
+
+internal actual fun initializeAndroidSecureStorageManager(context: Any?): Boolean {
+    return true
 }

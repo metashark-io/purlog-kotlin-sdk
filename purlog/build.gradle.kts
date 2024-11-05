@@ -56,7 +56,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:3.0.0")  // JVM/Android engine
-                implementation("org.bouncycastle:bcprov-jdk15on:1.47")
+                implementation("androidx.security:security-crypto:1.1.0-alpha06")
             }
         }
 
@@ -74,7 +74,6 @@ kotlin {
         /*val jvmMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:3.0.0")  // JVM/Android engine
-                implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
         }*/
 
@@ -112,13 +111,11 @@ kotlin {
         /*val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit")) // JUnit support for JVM
-                implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
         }*/
         val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test-junit")) // JUnit support for Android
-                implementation("org.bouncycastle:bcprov-jdk15on:1.47")
             }
         }
 

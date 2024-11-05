@@ -10,7 +10,6 @@ import com.metashark.purlog.models.PurLogConfig
 import com.metashark.purlog.utils.createUUIDIfNotExists
 import com.metashark.purlog.utils.get
 import com.metashark.purlog.utils.refreshTokenIfExpired
-import com.metashark.purlog.utils.registerBouncyCastle
 import com.metashark.purlog.utils.shouldLog
 import core.api.SessionTokenManager.createToken
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,6 @@ object PurLog {
                 PurLogException(PurLogError.error("Initialization failed", "Already initialized", PurLogLevel.WARN))
             )
         }
-        registerBouncyCastle()
         SdkLogger.shared.initialize(config)
         this@PurLog.config = config
         SdkLogger.shared.log(PurLogLevel.VERBOSE, "Initializing PurLog...")

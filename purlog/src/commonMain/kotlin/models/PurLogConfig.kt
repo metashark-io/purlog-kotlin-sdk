@@ -3,8 +3,9 @@ package com.metashark.purlog.models
 import com.metashark.purlog.enums.PurLogEnv
 import com.metashark.purlog.enums.PurLogLevel
 import com.metashark.purlog.utils.deviceInfo
+import com.metashark.purlog.utils.didInitializeContext
 import com.metashark.purlog.utils.getClientVersion
-import com.metashark.purlog.utils.registerBouncyCastle
+import com.metashark.purlog.utils.initializeAndroidSecureStorageManager
 
 data class PurLogConfig(
     val level: PurLogLevel,
@@ -16,10 +17,13 @@ data class PurLogConfig(
     class Builder {
         private var level: PurLogLevel = PurLogLevel.VERBOSE
         private var env: PurLogEnv = PurLogEnv.DEV
-        private var projectId: String? = null
+        private lateinit var projectId: String
+        private lateinit var projectJWT: String
+
+        private var didSetContext: Boolean = false
 
         internal var runTimeDeviceInfo: Map<String, String> = emptyMap()
-        internal var appVersion: String = ""
+        internal var appVersion: String? = null
 
         fun setLevel(level: PurLogLevel) = apply {
             this.level = level
@@ -29,18 +33,32 @@ data class PurLogConfig(
             this.env = env
         }
 
+        // android only: should be of type `import android.content.Context`
+        fun setContext(context: Any?) = apply {
+            didSetContext = initializeAndroidSecureStorageManager(context)
+            runTimeDeviceInfo = deviceInfo(context)
+            appVersion = getClientVersion(context)
+        }
+
         fun setProject(projectId: String, projectJWT: String) = apply {
-            registerBouncyCastle()
-            PurLogProject.create(projectId, projectJWT)
             this.projectId = projectId
+            this.projectJWT = projectJWT
         }
 
         fun build(): PurLogConfig {
+            if (!didInitializeContext(didSetContext)) {
+                throw IllegalArgumentException("Invalid context. Please pass in android.content.Context into the setContext() builder method")
+            }
+            if (::projectId.isInitialized && ::projectJWT.isInitialized) {
+                PurLogProject.create(projectId, projectJWT)
+            }
             if (runTimeDeviceInfo.isEmpty()) {
                 runTimeDeviceInfo = deviceInfo(null)
+            }
+            if (appVersion == null) {
                 appVersion = getClientVersion(null)
             }
-            return PurLogConfig(level, env, projectId, runTimeDeviceInfo, appVersion)
+            return PurLogConfig(level, env, if (::projectId.isInitialized) projectId else null, runTimeDeviceInfo, appVersion ?: "")
         }
     }
 }
