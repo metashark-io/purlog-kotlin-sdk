@@ -37,7 +37,7 @@ internal class SdkLogger private constructor() {
             PurLogLevel.INFO -> com.metashark.purlog.utils.logMessage(logLevel, "🟢 $formattedMessageWithMetaData")
             PurLogLevel.WARN -> com.metashark.purlog.utils.logMessage(logLevel, "🟡 $formattedMessageWithMetaData")
             PurLogLevel.ERROR -> com.metashark.purlog.utils.logMessage(logLevel, "🔴 $formattedMessageWithMetaData")
-            PurLogLevel.FATAL -> com.metashark.purlog.utils.logMessage(logLevel, "🔴 $formattedMessageWithMetaData")
+            PurLogLevel.FATAL -> com.metashark.purlog.utils.logMessage(logLevel, "🔴🔴🔴 $formattedMessageWithMetaData") 
         }
     }
 }
