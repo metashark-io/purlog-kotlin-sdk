@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -5,8 +6,11 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     kotlin("plugin.serialization") version "2.0.20"
     alias(libs.plugins.androidLibrary)
-    id("maven-publish")
+    id("com.vanniktech.maven.publish") version "0.30.0"
 }
+
+group = "io.metashark"
+version = "0.9.0"
 
 kotlin {
     //jvm()
@@ -167,5 +171,39 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+}
+
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    signAllPublications()
+
+    coordinates(group.toString(), "purlog", version.toString())
+
+    pom {
+        name.set("PurLog")
+        description.set("A remote logging SDK for Native Android and Kotlin Multi Platform (Android, iOS, iPadOS, macOS, watchOS, tvOS).")
+        url.set("https://github.com/metashark-io/purlog-kotlin-sdk")
+
+        licenses {
+            license {
+                name.set("MIT")
+                url.set("https://opensource.org/licenses/MIT")
+            }
+        }
+        developers {
+            developer {
+                id.set("MetaShark")
+                name.set("MetaShark")
+                organization.set("MetaShark")
+                organizationUrl.set("https://metashark.io")
+            }
+        }
+        scm {
+            url.set("https://github.com/metashark-io/purlog-kotlin-sdk")
+            connection.set("scm:git:git://github.com/metashark-io/purlog-kotlin-sdk.git")
+            developerConnection.set("scm:git:ssh://git@github.com/metashark-io/purlog-kotlin-sdk.git")
+        }
     }
 }
